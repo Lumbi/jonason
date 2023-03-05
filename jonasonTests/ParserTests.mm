@@ -81,7 +81,7 @@
         std::string string(R"( { hello: "world" } )");
         jonason::JSONValue json;
         jonason::parse(string, json);
-        XCTFail()
+        XCTFail();
     } catch (const jonason::ParseError& error) {
         XCTAssertEqual(error.code, jonason::ParseError::UNEXPECTED_TOKEN);
     }
