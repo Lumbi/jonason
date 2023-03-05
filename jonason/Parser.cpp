@@ -109,9 +109,7 @@ void parse_json_object_key_value(Tokens tokens, Iterator iterator, Out out)
 {
     std::string key;
     parse_json_object_key(tokens, iterator, key);
-
     parse_json_token(Token::COLUMN, iterator);
-    if (iterator++; iterator >= tokens.end()) { throw ParseError::unexpected_eof; }
 
     JSONValue value;
     parse_json_value(tokens, iterator, value);
