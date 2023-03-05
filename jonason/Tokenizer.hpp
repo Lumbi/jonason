@@ -32,6 +32,8 @@ public:
     }
     tag;
 
+    char* value = nullptr;
+
     using Type = decltype(Token::LITERAL);
 
 public:
@@ -47,8 +49,6 @@ public:
 
     ~Token();
 
-public:
-    char* value = nullptr;
 };
 
 void tokenize(const std::string& string, std::vector<Token>& out);
