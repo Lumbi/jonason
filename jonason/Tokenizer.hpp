@@ -32,8 +32,11 @@ public:
     }
     tag;
 
+    using Type = decltype(Token::LITERAL);
+
 public:
-    Token(decltype(Token::LITERAL) tag) : tag(tag) {};
+    Token() : tag(Token::LITERAL) {};
+    Token(Type tag) : tag(tag) {};
     Token(char* value) : tag(Token::LITERAL), value(value) {};
 
     Token(Token& other);
