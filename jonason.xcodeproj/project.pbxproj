@@ -10,6 +10,14 @@
 		0D95A42929B1278F00C26474 /* jonason.docc in Sources */ = {isa = PBXBuildFile; fileRef = 0D95A42829B1278F00C26474 /* jonason.docc */; };
 		0D95A42F29B1278F00C26474 /* jonason.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0D95A42429B1278F00C26474 /* jonason.framework */; };
 		0D95A43529B1278F00C26474 /* jonason.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D95A42729B1278F00C26474 /* jonason.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		0D95A44029B1280200C26474 /* Tokenizer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D95A43E29B1280200C26474 /* Tokenizer.cpp */; };
+		0D95A44129B1280200C26474 /* Tokenizer.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 0D95A43F29B1280200C26474 /* Tokenizer.hpp */; };
+		0D95A44529B15F2900C26474 /* TokenizerTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0D95A44429B15F2900C26474 /* TokenizerTests.mm */; };
+		0D95A44C29B28E7500C26474 /* JSONValue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D95A44A29B28E7500C26474 /* JSONValue.cpp */; };
+		0D95A44D29B28E7500C26474 /* JSONValue.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 0D95A44B29B28E7500C26474 /* JSONValue.hpp */; };
+		0D95A45029B2D2E600C26474 /* Parser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D95A44E29B2D2E600C26474 /* Parser.cpp */; };
+		0D95A45129B2D2E600C26474 /* Parser.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 0D95A44F29B2D2E600C26474 /* Parser.hpp */; };
+		0D95A45329B2E0A200C26474 /* ParserTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0D95A45229B2E0A200C26474 /* ParserTests.mm */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -27,6 +35,14 @@
 		0D95A42729B1278F00C26474 /* jonason.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = jonason.h; sourceTree = "<group>"; };
 		0D95A42829B1278F00C26474 /* jonason.docc */ = {isa = PBXFileReference; lastKnownFileType = folder.documentationcatalog; path = jonason.docc; sourceTree = "<group>"; };
 		0D95A42E29B1278F00C26474 /* jonasonTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = jonasonTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		0D95A43E29B1280200C26474 /* Tokenizer.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Tokenizer.cpp; sourceTree = "<group>"; };
+		0D95A43F29B1280200C26474 /* Tokenizer.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Tokenizer.hpp; sourceTree = "<group>"; };
+		0D95A44429B15F2900C26474 /* TokenizerTests.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = TokenizerTests.mm; sourceTree = "<group>"; };
+		0D95A44A29B28E7500C26474 /* JSONValue.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = JSONValue.cpp; sourceTree = "<group>"; };
+		0D95A44B29B28E7500C26474 /* JSONValue.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = JSONValue.hpp; sourceTree = "<group>"; };
+		0D95A44E29B2D2E600C26474 /* Parser.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Parser.cpp; sourceTree = "<group>"; };
+		0D95A44F29B2D2E600C26474 /* Parser.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Parser.hpp; sourceTree = "<group>"; };
+		0D95A45229B2E0A200C26474 /* ParserTests.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ParserTests.mm; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -71,6 +87,12 @@
 			children = (
 				0D95A42729B1278F00C26474 /* jonason.h */,
 				0D95A42829B1278F00C26474 /* jonason.docc */,
+				0D95A43E29B1280200C26474 /* Tokenizer.cpp */,
+				0D95A43F29B1280200C26474 /* Tokenizer.hpp */,
+				0D95A44A29B28E7500C26474 /* JSONValue.cpp */,
+				0D95A44B29B28E7500C26474 /* JSONValue.hpp */,
+				0D95A44E29B2D2E600C26474 /* Parser.cpp */,
+				0D95A44F29B2D2E600C26474 /* Parser.hpp */,
 			);
 			path = jonason;
 			sourceTree = "<group>";
@@ -78,6 +100,8 @@
 		0D95A43229B1278F00C26474 /* jonasonTests */ = {
 			isa = PBXGroup;
 			children = (
+				0D95A44429B15F2900C26474 /* TokenizerTests.mm */,
+				0D95A45229B2E0A200C26474 /* ParserTests.mm */,
 			);
 			path = jonasonTests;
 			sourceTree = "<group>";
@@ -89,6 +113,9 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0D95A44129B1280200C26474 /* Tokenizer.hpp in Headers */,
+				0D95A44D29B28E7500C26474 /* JSONValue.hpp in Headers */,
+				0D95A45129B2D2E600C26474 /* Parser.hpp in Headers */,
 				0D95A43529B1278F00C26474 /* jonason.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -192,7 +219,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0D95A44C29B28E7500C26474 /* JSONValue.cpp in Sources */,
 				0D95A42929B1278F00C26474 /* jonason.docc in Sources */,
+				0D95A45029B2D2E600C26474 /* Parser.cpp in Sources */,
+				0D95A44029B1280200C26474 /* Tokenizer.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -200,6 +230,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0D95A45329B2E0A200C26474 /* ParserTests.mm in Sources */,
+				0D95A44529B15F2900C26474 /* TokenizerTests.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -402,11 +434,17 @@
 		0D95A43C29B1278F00C26474 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = VQ5V23TK4V;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.1;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				MACOSX_DEPLOYMENT_TARGET = 12.5;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.gabriellumbi.jonasonTests;
@@ -414,6 +452,7 @@
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
 				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -422,11 +461,17 @@
 		0D95A43D29B1278F00C26474 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = VQ5V23TK4V;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.1;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				MACOSX_DEPLOYMENT_TARGET = 12.5;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.gabriellumbi.jonasonTests;
