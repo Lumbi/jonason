@@ -35,6 +35,25 @@
     XCTAssertEqual(json["hello"].string, std::string("world"));
 }
 
+- (void) test_array_empty {
+    std::string string(R"( [ ] )");
+    jonason::JSONValue json;
+    jonason::parse(string, json);
+
+    XCTAssertEqual(json.tag, jonason::JSONValue::ARRAY);
+    XCTAssertEqual(json[0].tag, jonason::JSONValue::JSON_NULL);
+}
+
+- (void) test_array_with_single_string {
+    std::string string(R"( [ "hello" ] )");
+    jonason::JSONValue json;
+    jonason::parse(string, json);
+
+    XCTAssertEqual(json.tag, jonason::JSONValue::ARRAY);
+    XCTAssertEqual(json[0].tag, jonason::JSONValue::STRING);
+    XCTAssertEqual(json[0].string, std::string("hello"));
+}
+
 - (void) testUnexpectedEOFError {
     try {
         std::string string(R"( { "hello" : "world" )");
