@@ -37,8 +37,8 @@ struct ParseError: public std::exception {
 };
 
 
-void parse(const std::string&, JSONValue& out);
-void parse(std::istream& istream, JSONValue& out);
+void parse(const std::string&, JSONValue* out);
+void parse(std::istream& istream, JSONValue* out);
 
 }
 

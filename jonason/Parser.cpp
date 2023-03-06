@@ -28,7 +28,7 @@ const ParseError ParseError::unknown_error(ParseError::UNKNOWN, std::string("Unk
 // Parsers
 
 using Iterator = std::vector<Token>::iterator&;
-using Out = JSONValue&;
+using Out = JSONValue*;
 
 static void parse_json_token(Token::Type, Iterator);
 static void parse_json_value(Iterator, Iterator, Out);
@@ -38,7 +38,7 @@ static void parse_json_object_key(Iterator, Iterator, JSONValue::KeyType& out);
 static void parse_json_array(Iterator, Iterator, Out);
 static void parse_json_string(Iterator, Iterator, Out);
 
-void parse(const std::string& string, JSONValue& out)
+void parse(const std::string& string, JSONValue* out)
 {
     if (string.empty()) { throw ParseError::unexpected_eof; }
 
@@ -52,7 +52,7 @@ void parse(const std::string& string, JSONValue& out)
     parse_json_value(begin, end, out);
 }
 
-void parse(std::istream& istream, JSONValue& out)
+void parse(std::istream& istream, JSONValue* out)
 {
     std::vector<Token> tokens;
     tokenize(istream, tokens);
@@ -107,7 +107,7 @@ void parse_json_value(Iterator iterator, Iterator end, Out out)
 
 void parse_json_object(Iterator iterator, Iterator end, Out out)
 {
-    out = JSONValue(JSONValue::OBJECT);
+    out = new JSONValue(JSONValue::OBJECT);
 
     parse_json_token(Token::OBJECT_OPEN, iterator);
 
@@ -136,10 +136,10 @@ void parse_json_object_key_value(Iterator iterator, Iterator end, Out out)
     parse_json_object_key(iterator, end, key);
     parse_json_token(Token::COLUMN, iterator);
 
-    JSONValue value;
+    JSONValue* value = nullptr;
     parse_json_value(iterator, end, value);
 
-    out.set(key, std::move(value));
+    out->set(key, value);
 }
 
 void parse_json_object_key(Iterator iterator, Iterator end, std::string& out)
@@ -158,7 +158,7 @@ void parse_json_object_key(Iterator iterator, Iterator end, std::string& out)
 
 static void parse_json_array(Iterator iterator, Iterator end, Out out)
 {
-    out = JSONValue(JSONValue::ARRAY);
+    out = new JSONValue(JSONValue::ARRAY);
 
     parse_json_token(Token::ARRAY_OPEN, iterator);
 
@@ -171,9 +171,9 @@ static void parse_json_array(Iterator iterator, Iterator end, Out out)
                 iterator++;
                 return;
             default:
-                JSONValue value;
+                JSONValue* value = nullptr;
                 parse_json_value(iterator, end, value);
-                out.array.push_back(std::move(value));
+                out->array.push_back(value);
                 break;
         }
     }
@@ -188,7 +188,7 @@ void parse_json_string(Iterator iterator, Iterator end, Out out)
     parse_json_token(Token::DOUBLE_QUOTE, iterator);
 
     if (iterator >= end) { throw ParseError::unexpected_eof; }
-    if (iterator->tag == Token::LITERAL) { out = JSONValue(std::string(iterator->value)); }
+    if (iterator->tag == Token::LITERAL) { out = new JSONValue(std::string(iterator->value)); }
     iterator++;
 
     if (iterator >= end) { throw ParseError::unexpected_eof; }

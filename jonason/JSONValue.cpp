@@ -89,20 +89,30 @@ JSONValue& JSONValue::operator=(JSONValue&& other)
     return *this;
 }
 
+JSONValue::~JSONValue()
+{
+    switch (tag) {
+        case OBJECT:
+            for (auto&& element : object) { delete element.second; element.second = nullptr; } break;
+        case ARRAY:
+            for (auto&& element : array) { delete element; element = nullptr; } break;
+        default:
+            break;
+    }
+}
+
 // Object
 
 const JSONValue& JSONValue::operator[](const std::string& key) const
 {
     auto found = object.find(key);
-    if (found != object.end()) {
-        return found->second;
-    } else {
-        return JSONValue::null;
-    }
+    if (found != object.end() && found->second) return *found->second;
+    return JSONValue::null;
 }
 
-void JSONValue::set(KeyType key, JSONValue&& value)
+void JSONValue::set(KeyType key, JSONValue* value)
 {
+    delete object[key];
     object[key] = value;
 }
 
@@ -110,11 +120,8 @@ void JSONValue::set(KeyType key, JSONValue&& value)
 
 const JSONValue& JSONValue::operator[](std::size_t index) const
 {
-    if (index < array.size()) {
-        return array[index];
-    } else {
-        return JSONValue::null;
-    }
+    if (index < array.size() && array[index]) return *array[index];
+    return JSONValue::null;
 }
 
 }

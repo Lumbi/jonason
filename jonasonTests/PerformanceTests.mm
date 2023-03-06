@@ -51,7 +51,7 @@ using std::chrono::milliseconds;
         ifstream.open(file_path, std::ifstream::in);
 
         [self startMeasuring];
-        jonason::JSONValue json;
+        jonason::JSONValue* json = nullptr;
         try {
             jonason::parse(ifstream, json);
         } catch (...) {

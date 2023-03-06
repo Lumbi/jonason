@@ -17,8 +17,8 @@ namespace jonason {
 struct JSONValue {
     enum { OBJECT, ARRAY, STRING, NUMBER, BOOLEAN, JSON_NULL } tag;
 
-    using ObjectType = std::unordered_map<std::string, JSONValue>;
-    using ArrayType = std::vector<JSONValue>;
+    using ObjectType = std::unordered_map<std::string, JSONValue*>;
+    using ArrayType = std::vector<JSONValue*>;
     using StringType = std::string;
     using NumberType = double;
     using BooleanType = bool;
@@ -47,12 +47,12 @@ struct JSONValue {
     JSONValue(JSONValue&&);
     JSONValue& operator=(JSONValue&&);
 
-    ~JSONValue() {};
+    ~JSONValue();
 
     // Object
 
     const JSONValue& operator[](const KeyType&) const;
-    void set(KeyType, JSONValue&&);
+    void set(KeyType, JSONValue*);
 
     // Array
 
