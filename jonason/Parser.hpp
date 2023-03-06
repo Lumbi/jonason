@@ -9,6 +9,7 @@
 #define Parser_hpp
 
 #include <string>
+#include <memory>
 
 #include "JSONValue.hpp"
 #include "Tokenizer.hpp"
@@ -37,8 +38,8 @@ struct ParseError: public std::exception {
 };
 
 
-void parse(const std::string&, JSONValue* out);
-void parse(std::istream& istream, JSONValue* out);
+std::unique_ptr<JSONValue> parse(const std::string&);
+std::unique_ptr<JSONValue> parse(std::istream& istream);
 
 }
 
