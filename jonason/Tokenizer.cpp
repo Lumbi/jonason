@@ -86,7 +86,7 @@ void tokenize(std::istream& istream, std::vector<Token>& out) {
             default:
                 value_buffer.clear();
                 value_buffer.push_back(char_buffer);
-                read_literal(istream, value_buffer, [](char c) { return is_ws(c) || c == Token::COMMA || c == Token::OBJECT_CLOSE; }, out);
+                read_literal(istream, value_buffer, [](char c) { return is_ws(c) || c == Token::COMMA || c == Token::OBJECT_CLOSE || c == Token::ARRAY_CLOSE; }, out);
                 break;
         }
 
