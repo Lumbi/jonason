@@ -44,6 +44,9 @@ struct JSONValue {
     JSONValue(const JSONValue&);
     JSONValue& operator=(const JSONValue&);
 
+    JSONValue(JSONValue&&);
+    JSONValue& operator=(JSONValue&&);
+
     ~JSONValue() {};
 
     // Object
