@@ -130,7 +130,8 @@ Out parse_json_object(Iterator iterator, Iterator end)
         switch (iterator->tag) {
             case Token::DOUBLE_QUOTE: {
                 auto key_value = parse_json_object_key_value(iterator, end);
-                out->set(key_value.first, key_value.second);
+                delete out->object[key_value.first];
+                out->object[key_value.first] = key_value.second;
                 break;
             }
             case Token::COMMA: // TODO: Handle invalid single comma in empty object

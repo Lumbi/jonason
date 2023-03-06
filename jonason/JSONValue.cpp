@@ -110,12 +110,6 @@ const JSONValue& JSONValue::operator[](const std::string& key) const
     return JSONValue::null;
 }
 
-void JSONValue::set(KeyType key, JSONValue* value)
-{
-    delete object[key];
-    object[key] = value;
-}
-
 // Array
 
 const JSONValue& JSONValue::operator[](std::size_t index) const

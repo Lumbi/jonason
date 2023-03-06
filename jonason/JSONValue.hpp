@@ -52,7 +52,6 @@ struct JSONValue {
     // Object
 
     const JSONValue& operator[](const KeyType&) const;
-    void set(KeyType, JSONValue*);
 
     // Array
 
