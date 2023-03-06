@@ -74,7 +74,16 @@ void parse_json_value(Iterator iterator, Iterator end, Out out)
             parse_json_string(iterator, end, out);
             break;
         case Token::LITERAL:
-            // TODO: parse literal (true, false, number or null)
+            if (strcmp(iterator->value, "true") == 0) {
+                out = JSONValue(true);
+            } else if (strcmp(iterator->value, "false") == 0) {
+                out = JSONValue(false);
+            } else if (strcmp(iterator->value, "null") == 0) {
+                out = JSONValue();
+            } else {
+                // TODO: Parse number
+            }
+            iterator++;
             return;
         default:
             throw ParseError::unexpected_token(*iterator);

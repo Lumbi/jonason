@@ -16,6 +16,33 @@
 
 @implementation ParserTests
 
+- (void) test_json_true {
+    std::string string(R"( true )");
+    jonason::JSONValue json;
+    jonason::parse(string, json);
+
+    XCTAssertEqual(json.tag, jonason::JSONValue::BOOLEAN);
+    XCTAssertEqual(json.boolean, true);
+}
+
+- (void) test_json_false {
+    std::string string(R"( false )");
+    jonason::JSONValue json;
+    jonason::parse(string, json);
+
+    XCTAssertEqual(json.tag, jonason::JSONValue::BOOLEAN);
+    XCTAssertEqual(json.boolean, false);
+}
+
+- (void) test_json_null {
+    std::string string(R"( null )");
+    jonason::JSONValue json;
+    jonason::parse(string, json);
+
+    XCTAssertEqual(json.tag, jonason::JSONValue::JSON_NULL);
+    XCTAssert(json.is_null());
+}
+
 - (void) test_object_empty {
     std::string string(R"( {  } )");
     jonason::JSONValue json;
