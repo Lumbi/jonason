@@ -35,6 +35,7 @@ static void parse_json_value(Iterator, Iterator, Out);
 static void parse_json_object(Iterator, Iterator, Out);
 static void parse_json_object_key_value(Iterator, Iterator, Out);
 static void parse_json_object_key(Iterator, Iterator, JSONValue::KeyType& out);
+static void parse_json_array(Iterator, Iterator, Out);
 static void parse_json_string(Iterator, Iterator, Out);
 
 void parse(const std::string& string, JSONValue& out)
@@ -67,7 +68,7 @@ void parse_json_value(Iterator iterator, Iterator end, Out out)
             parse_json_object(iterator, end, out);
             break;
         case Token::ARRAY_OPEN:
-            // TODO: parse array
+            parse_json_array(iterator, end, out);
             return;
         case Token::DOUBLE_QUOTE:
             parse_json_string(iterator, end, out);
@@ -79,6 +80,8 @@ void parse_json_value(Iterator iterator, Iterator end, Out out)
             throw ParseError::unexpected_token(*iterator);
     }
 }
+
+// Parse Object
 
 void parse_json_object(Iterator iterator, Iterator end, Out out)
 {
@@ -128,6 +131,35 @@ void parse_json_object_key(Iterator iterator, Iterator end, std::string& out)
     if (iterator >= end) { throw ParseError::unexpected_eof; }
     parse_json_token(Token::DOUBLE_QUOTE, iterator);
 }
+
+// Parse Array
+
+static void parse_json_array(Iterator iterator, Iterator end, Out out)
+{
+    out = JSONValue(JSONValue::ARRAY);
+
+    parse_json_token(Token::ARRAY_OPEN, iterator);
+
+    while (iterator < end) {
+        switch (iterator->tag) {
+            case Token::COMMA:
+                iterator++;
+                break;
+            case Token::ARRAY_CLOSE:
+                iterator++;
+                return;
+            default:
+                JSONValue value;
+                parse_json_value(iterator, end, value);
+                out.array.push_back(std::move(value));
+                break;
+        }
+    }
+
+    throw ParseError::unexpected_eof;
+}
+
+// Parse String
 
 void parse_json_string(Iterator iterator, Iterator end, Out out)
 {
