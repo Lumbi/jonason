@@ -42,9 +42,7 @@ JSONValue& JSONValue::operator=(const JSONValue& other)
         case OBJECT: object.~ObjectType(); break;
         case ARRAY: array.~ArrayType(); break;
         case STRING: string.~StringType(); break;
-        case NUMBER: break;
-        case BOOLEAN: break;
-        case JSON_NULL: break;
+        default: break;
     }
     tag = other.tag;
     switch (tag) {
