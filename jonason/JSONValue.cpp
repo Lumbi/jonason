@@ -11,15 +11,25 @@
 
 namespace jonason {
 
+JSONValue::JSONValue(decltype(OBJECT) tag): tag(tag) {
+    switch (tag) {
+        case OBJECT: new(&object) ObjectType(); break;
+        case ARRAY: new(&array) ArrayType(); break;
+        case STRING: new(&string) StringType(); break;
+        case NUMBER: number = 0; break;
+        case BOOLEAN: boolean = false; break;
+        case JSON_NULL: boolean = false; break;
+    }
+};
 
 JSONValue::JSONValue(const JSONValue& other)
 {
     if (this == &other) { return; }
     tag = other.tag;
     switch (tag) {
-        case OBJECT: object = other.object; break;
-        case ARRAY: array = other.array; break;
-        case STRING: string = other.string; break;
+        case OBJECT: new(&object) ObjectType(other.object); break;
+        case ARRAY: new(&array) ArrayType(other.array); break;
+        case STRING: new(&string) StringType(other.string); break;
         case NUMBER: number = other.number; break;
         case BOOLEAN: boolean = other.boolean; break;
         case JSON_NULL: break;

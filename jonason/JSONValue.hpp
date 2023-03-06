@@ -33,16 +33,7 @@ struct JSONValue {
     };
 
     explicit JSONValue(): tag(JSON_NULL), boolean(false) {};
-    explicit JSONValue(decltype(OBJECT) tag): tag(tag) {
-        switch (tag) {
-            case OBJECT: new(&object) ObjectType(); break;
-            case ARRAY: new(&array) ArrayType(); break;
-            case STRING: new(&string) StringType(); break;
-            case NUMBER: number = 0; break;
-            case BOOLEAN: boolean = false; break;
-            case JSON_NULL: boolean = false; break;
-        }
-    };
+    explicit JSONValue(decltype(OBJECT) tag);
 
     explicit JSONValue(const ObjectType& value): tag(OBJECT), object(value) {};
     explicit JSONValue(const ArrayType& value): tag(ARRAY), array(value) {};
