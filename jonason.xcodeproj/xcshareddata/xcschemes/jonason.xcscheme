@@ -53,6 +53,11 @@
                BlueprintName = "jonasonTests"
                ReferencedContainer = "container:jonason.xcodeproj">
             </BuildableReference>
+            <SkippedTests>
+               <Test
+                  Identifier = "PerformanceTests">
+               </Test>
+            </SkippedTests>
          </TestableReference>
       </Testables>
    </TestAction>

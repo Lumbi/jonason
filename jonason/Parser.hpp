@@ -36,7 +36,9 @@ struct ParseError: public std::exception {
     static const ParseError unknown_error;
 };
 
+
 void parse(const std::string&, JSONValue& out);
+void parse(std::istream& istream, JSONValue& out);
 
 }
 

@@ -52,6 +52,18 @@ void parse(const std::string& string, JSONValue& out)
     parse_json_value(begin, end, out);
 }
 
+void parse(std::istream& istream, JSONValue& out)
+{
+    std::vector<Token> tokens;
+    tokenize(istream, tokens);
+
+    if (tokens.empty()) { throw ParseError::unexpected_eof; }
+
+    auto begin = tokens.begin();
+    auto end = tokens.end();
+    parse_json_value(begin, end, out);
+}
+
 static void parse_json_token(Token::Type token, Iterator iterator)
 {
     if (iterator->tag == token) {
