@@ -76,27 +76,44 @@ static void parse_json_token(Token::Type token, Iterator iterator)
 void parse_json_value(Iterator iterator, Iterator end, Out out)
 {
     switch (iterator->tag) {
+        case Token::DOUBLE_QUOTE:
+            parse_json_string(iterator, end, out);
+            break;
+        case Token::LITERAL:
+            switch (*iterator->value) {
+                case 't':
+                    if (strcmp(iterator->value, "true") == 0) {
+                        out = new JSONValue(true);
+                    } else {
+                        throw ParseError::unexpected_token(*iterator);
+                    }
+                    break;
+                case 'f':
+                    if (strcmp(iterator->value, "false") == 0) {
+                        out = new JSONValue(false);
+                    } else {
+                        throw ParseError::unexpected_token(*iterator);
+                    }
+                    break;
+                case 'n':
+                    if(strcmp(iterator->value, "null") == 0) {
+                        out = new JSONValue();
+                    } else {
+                        throw ParseError::unexpected_token(*iterator);
+                    }
+                    break;
+                default:
+                    double number = strtod(iterator->value, nullptr); // TODO: Handle endptr and out-of-range errors
+                    out = new JSONValue(number);
+                    break;
+            }
+            iterator++;
+            return;
         case Token::OBJECT_OPEN:
             parse_json_object(iterator, end, out);
             break;
         case Token::ARRAY_OPEN:
             parse_json_array(iterator, end, out);
-            return;
-        case Token::DOUBLE_QUOTE:
-            parse_json_string(iterator, end, out);
-            break;
-        case Token::LITERAL:
-            if (strcmp(iterator->value, "true") == 0) {
-                out = JSONValue(true);
-            } else if (strcmp(iterator->value, "false") == 0) {
-                out = JSONValue(false);
-            } else if (strcmp(iterator->value, "null") == 0) {
-                out = JSONValue();
-            } else {
-                double number = strtod(iterator->value, nullptr); // TODO: Handle endptr and out-of-range errors
-                out = JSONValue(number);
-            }
-            iterator++;
             return;
         default:
             throw ParseError::unexpected_token(*iterator);
