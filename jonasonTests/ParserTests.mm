@@ -71,6 +71,30 @@
     XCTAssertEqual(json["hello"].string, std::string("world"));
 }
 
+- (void) test_object_with_nested_object {
+    std::string string(R"( { "foo": { "bar": 17 } } )");
+    jonason::JSONValue json;
+    jonason::parse(string, json);
+
+    XCTAssertEqual(json.tag, jonason::JSONValue::OBJECT);
+    XCTAssertEqual(json["foo"].tag, jonason::JSONValue::OBJECT);
+    XCTAssertEqual(json["foo"]["bar"].tag, jonason::JSONValue::NUMBER);
+    XCTAssertEqual(json["foo"]["bar"].number, 17);
+}
+
+- (void) test_object_with_nested_array {
+    std::string string(R"( { "foo": [ "bar", 17 ] } )");
+    jonason::JSONValue json;
+    jonason::parse(string, json);
+
+    XCTAssertEqual(json.tag, jonason::JSONValue::OBJECT);
+    XCTAssertEqual(json["foo"].tag, jonason::JSONValue::ARRAY);
+    XCTAssertEqual(json["foo"][0].tag, jonason::JSONValue::STRING);
+    XCTAssertEqual(json["foo"][0].string, std::string("bar"));
+    XCTAssertEqual(json["foo"][1].tag, jonason::JSONValue::NUMBER);
+    XCTAssertEqual(json["foo"][1].number, 17);
+}
+
 - (void) test_array_empty {
     std::string string(R"( [ ] )");
     jonason::JSONValue json;
@@ -88,6 +112,33 @@
     XCTAssertEqual(json.tag, jonason::JSONValue::ARRAY);
     XCTAssertEqual(json[0].tag, jonason::JSONValue::STRING);
     XCTAssertEqual(json[0].string, std::string("hello"));
+}
+
+- (void) test_array_with_nested_array {
+    std::string string(R"( [ ["foo", true] ] )");
+    jonason::JSONValue json;
+    jonason::parse(string, json);
+
+    XCTAssertEqual(json.tag, jonason::JSONValue::ARRAY);
+    XCTAssertEqual(json.array.size(), 1);
+    XCTAssertEqual(json[0].tag, jonason::JSONValue::ARRAY);
+    XCTAssertEqual(json[0].array.size(), 2);
+    XCTAssertEqual(json[0][0].tag, jonason::JSONValue::STRING);
+    XCTAssertEqual(json[0][0].string, std::string("foo"));
+    XCTAssertEqual(json[0][1].tag, jonason::JSONValue::BOOLEAN);
+    XCTAssertEqual(json[0][1].boolean, true);
+}
+
+- (void) test_array_with_nested_object {
+    std::string string(R"( [ { "foo": true } ] )");
+    jonason::JSONValue json;
+    jonason::parse(string, json);
+
+    XCTAssertEqual(json.tag, jonason::JSONValue::ARRAY);
+    XCTAssertEqual(json.array.size(), 1);
+    XCTAssertEqual(json[0].tag, jonason::JSONValue::OBJECT);
+    XCTAssertEqual(json[0]["foo"].tag, jonason::JSONValue::BOOLEAN);
+    XCTAssertEqual(json[0]["foo"].boolean, true);
 }
 
 - (void) testUnexpectedEOFError {
