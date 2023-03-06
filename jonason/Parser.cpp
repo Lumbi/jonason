@@ -81,7 +81,8 @@ void parse_json_value(Iterator iterator, Iterator end, Out out)
             } else if (strcmp(iterator->value, "null") == 0) {
                 out = JSONValue();
             } else {
-                // TODO: Parse number
+                double number = strtod(iterator->value, nullptr); // TODO: Handle endptr and out-of-range errors
+                out = JSONValue(number);
             }
             iterator++;
             return;

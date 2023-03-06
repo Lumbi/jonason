@@ -43,6 +43,15 @@
     XCTAssert(json.is_null());
 }
 
+- (void) test_json_number {
+    std::string string(R"( 3.1416 )");
+    jonason::JSONValue json;
+    jonason::parse(string, json);
+
+    XCTAssertEqual(json.tag, jonason::JSONValue::NUMBER);
+    XCTAssertEqual(json.number, 3.1416);
+}
+
 - (void) test_object_empty {
     std::string string(R"( {  } )");
     jonason::JSONValue json;
