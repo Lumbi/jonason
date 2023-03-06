@@ -42,7 +42,7 @@ struct JSONValue {
     explicit JSONValue(BooleanType value): tag(BOOLEAN), boolean(value) {};
 
     JSONValue(const JSONValue&);
-    JSONValue& operator=(JSONValue);
+    JSONValue& operator=(const JSONValue&);
 
     ~JSONValue() {};
 

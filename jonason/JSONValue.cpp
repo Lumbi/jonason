@@ -36,16 +36,23 @@ JSONValue::JSONValue(const JSONValue& other)
     }
 }
 
-JSONValue& JSONValue::operator=(JSONValue other)
+JSONValue& JSONValue::operator=(const JSONValue& other)
 {
-    using std::swap;
-    swap(tag, other.tag);
     switch (tag) {
-        case OBJECT: swap(object, other.object); break;
-        case ARRAY: swap(array, other.array); break;
-        case STRING: swap(string, other.string); break;
-        case NUMBER: swap(number, other.number); break;
-        case BOOLEAN: swap(boolean, other.boolean); break;
+        case OBJECT: object.~ObjectType(); break;
+        case ARRAY: array.~ArrayType(); break;
+        case STRING: string.~StringType(); break;
+        case NUMBER: break;
+        case BOOLEAN: break;
+        case JSON_NULL: break;
+    }
+    tag = other.tag;
+    switch (tag) {
+        case OBJECT: new(&object) ObjectType(other.object); break;
+        case ARRAY: new(&array) ArrayType(other.array); break;
+        case STRING: new(&string) StringType(other.string); break;
+        case NUMBER: number = other.number; break;
+        case BOOLEAN: boolean = other.boolean; break;
         case JSON_NULL: break;
     }
     return *this;
