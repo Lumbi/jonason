@@ -16,8 +16,6 @@ Token::Token(Token& other) {
 
     tag = other.tag;
 
-    delete value;
-    value = nullptr;
     size_t size = strlen(other.value);
     value = size ? new char[size] : nullptr;
     std::copy(other.value, other.value + size, value);
@@ -45,7 +43,6 @@ Token& Token::operator=(Token&& other) {
 
 Token::~Token() {
     delete[] value;
-    value = nullptr;
 }
 
 constexpr bool is_ws(char character) {
