@@ -10,12 +10,7 @@
 #include <jonason/jonason.h>
 #include <string>
 #include <fstream>
-#include <chrono>
-
-using std::chrono::high_resolution_clock;
-using std::chrono::duration_cast;
-using std::chrono::duration;
-using std::chrono::milliseconds;
+#include <vector>
 
 @interface PerformanceTests : XCTestCase
 
@@ -24,7 +19,7 @@ using std::chrono::milliseconds;
 @implementation PerformanceTests
 
 
-- (void) testBenchmark {
+- (void) testPeformanceBenchmark {
 
     NSString* file_path = [[NSBundle bundleForClass:[self class]] pathForResource:@"canada" ofType:@"json"];
 
@@ -43,7 +38,7 @@ using std::chrono::milliseconds;
     }];
 }
 
-- (void) testPerformance {
+- (void) testParsePerformance {
     const char* file_path = [[[NSBundle bundleForClass:[self class]] pathForResource:@"canada" ofType:@"json"] UTF8String];
 
     [self measureMetrics:[self class].defaultPerformanceMetrics automaticallyStartMeasuring:NO forBlock:^{
@@ -60,5 +55,18 @@ using std::chrono::milliseconds;
     }];
 }
 
+- (void) testTokenizePerformance {
+    const char* file_path = [[[NSBundle bundleForClass:[self class]] pathForResource:@"canada" ofType:@"json"] UTF8String];
+
+    [self measureMetrics:[self class].defaultPerformanceMetrics automaticallyStartMeasuring:NO forBlock:^{
+        std::ifstream ifstream;
+        ifstream.open(file_path, std::ifstream::in);
+
+        [self startMeasuring];
+        std::vector<jonason::Token> tokens;
+        jonason::tokenize(ifstream, tokens);
+        [self stopMeasuring];
+    }];
+}
 
 @end
