@@ -29,7 +29,7 @@
         NSError* error = nil;
 
         [self startMeasuring];
-        [NSJSONSerialization JSONObjectWithStream:istream options:0 error: nil];
+        [NSJSONSerialization JSONObjectWithStream:istream options:0 error: &error];
         [self stopMeasuring];
 
         if (error) { XCTFail(); }
