@@ -41,8 +41,8 @@ public:
     Token(Type tag) : tag(tag) {};
     Token(char* value) : tag(Token::LITERAL), value(value) {};
 
-    Token(Token& other);
-    Token& operator=(Token other);
+    Token(Token& other) = delete;
+    Token& operator=(Token other) = delete;
 
     Token(Token&& other);
     Token& operator=(Token&& other);

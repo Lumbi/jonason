@@ -11,23 +11,6 @@
 
 namespace jonason {
 
-Token::Token(Token& other) {
-    if (this == &other) { return; }
-
-    tag = other.tag;
-
-    size_t size = strlen(other.value);
-    value = size ? new char[size] : nullptr;
-    std::copy(other.value, other.value + size, value);
-}
-
-Token& Token::operator=(Token other) {
-    using std::swap;
-    swap(tag, other.tag);
-    swap(value, other.value);
-    return *this;
-}
-
 Token::Token(Token&& other) {
     tag = std::move(other.tag);
     value = std::move(other.value);
