@@ -52,7 +52,7 @@ constexpr bool is_ws(char character) {
     return character == 0x20 || character == 0x0a || character == 0x0d || character == 0x09;
 }
 
-static void read_literal(std::istream& istream, std::vector<char>& buffer, std::predicate<char> auto is_delimiter, std::vector<Token>& out);
+static void read_literal(std::istream& istream, char*& buffer, int& buffer_size, std::predicate<char> auto is_delimiter, std::vector<Token>& out);
 
 void tokenize(const std::string& string, std::vector<Token>& out)
 {
@@ -60,9 +60,12 @@ void tokenize(const std::string& string, std::vector<Token>& out)
     tokenize(istream, out);
 }
 
+const int MAX_LITERAL_SIZE = 1 << 16; // about 65KB
+
 void tokenize(std::istream& istream, std::vector<Token>& out) {
     char char_buffer;
-    std::vector<char> value_buffer;
+    char* value_buffer = new char[MAX_LITERAL_SIZE];
+    int value_buffer_count = 0;
 
     istream >> std::ws;
     while (istream.get(char_buffer)) {
@@ -76,25 +79,27 @@ void tokenize(std::istream& istream, std::vector<Token>& out) {
 
             case Token::DOUBLE_QUOTE:
                 out.push_back({ Token::DOUBLE_QUOTE });
-                if (value_buffer.empty()) {
-                    read_literal(istream, value_buffer, [](char c){ return c == Token::DOUBLE_QUOTE; }, out);
+                if (value_buffer_count == 0) {
+                    read_literal(istream, value_buffer, value_buffer_count, [](char c){ return c == Token::DOUBLE_QUOTE; }, out);
                 } else {
-                    value_buffer.clear();
+                    value_buffer_count = 0;
                 }
                 break;
 
             default:
-                value_buffer.clear();
-                value_buffer.push_back(char_buffer);
-                read_literal(istream, value_buffer, [](char c) { return is_ws(c) || c == Token::COMMA || c == Token::OBJECT_CLOSE || c == Token::ARRAY_CLOSE; }, out);
+                value_buffer[0] = char_buffer;
+                value_buffer_count = 1;
+                read_literal(istream, value_buffer, value_buffer_count, [](char c) { return is_ws(c) || c == Token::COMMA || c == Token::OBJECT_CLOSE || c == Token::ARRAY_CLOSE; }, out);
                 break;
         }
 
         istream >> std::ws;
     }
+
+    delete[] value_buffer;
 }
 
-void read_literal(std::istream& istream, std::vector<char>& buffer, std::predicate<char> auto is_delimiter, std::vector<Token>& out)
+void read_literal(std::istream& istream, char*& buffer, int& buffer_size, std::predicate<char> auto is_delimiter, std::vector<Token>& out)
 {
     char char_buffer;
     while (istream.good()) {
@@ -103,12 +108,15 @@ void read_literal(std::istream& istream, std::vector<char>& buffer, std::predica
             break;
         } else {
             istream.get(char_buffer);
-            buffer.push_back(char_buffer);
+            if (buffer_size < MAX_LITERAL_SIZE) {
+                buffer[buffer_size] = char_buffer;
+                buffer_size++;
+            }
         }
     }
-    char* value = new char[buffer.size() + 1];
-    std::copy(buffer.begin(), buffer.end(), value);
-    value[buffer.size()] = '\0';
+    char* value = new char[buffer_size + 1];
+    std::copy(buffer, buffer + buffer_size, value);
+    value[buffer_size] = '\0';
     out.push_back({ value });
 }
 
