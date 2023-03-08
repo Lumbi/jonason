@@ -43,7 +43,8 @@ void tokenize(std::istream& istream, std::vector<Token>& out) {
     char* value_buffer = new char[MAX_LITERAL_SIZE];
     int value_buffer_count = 0;
 
-    istream >> std::ws;
+    istream >> std::ws; // NOTE: Note same behaviour as `is_ws`
+
     while (istream.get(char_buffer)) {
         switch (char_buffer) {
             case Token::OBJECT_OPEN: out.push_back({ Token::OBJECT_OPEN }); break;
@@ -65,11 +66,11 @@ void tokenize(std::istream& istream, std::vector<Token>& out) {
             default:
                 value_buffer[0] = char_buffer;
                 value_buffer_count = 1;
-                read_literal(istream, value_buffer, value_buffer_count, [](char c) { return is_ws(c) || c == Token::COMMA || c == Token::OBJECT_CLOSE || c == Token::ARRAY_CLOSE; }, out);
+                read_literal(istream, value_buffer, value_buffer_count, [](char c){ return is_ws(c) || c == Token::COMMA || c == Token::OBJECT_CLOSE || c == Token::ARRAY_CLOSE; }, out);
                 break;
         }
 
-        istream >> std::ws;
+        istream >> std::ws; // NOTE: Note same behaviour as `is_ws`
     }
 
     delete[] value_buffer;
