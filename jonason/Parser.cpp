@@ -17,7 +17,7 @@ const ParseError ParseError::unexpected_eof(ParseError::UNEXPECTED_EOF, std::str
 
 ParseError ParseError::unexpected_token(const Token& token) {
     if (token.tag == Token::LITERAL) {
-        return ParseError(ParseError::UNEXPECTED_TOKEN, std::string("Did quite get what you meant by this buddy: ") + token.value);
+        return ParseError(ParseError::UNEXPECTED_TOKEN, std::string("Did quite get what you meant by this buddy: ") + token.value.get());
     } else {
         return ParseError(ParseError::UNEXPECTED_TOKEN, std::string("Hey, is this a typo?: ") + static_cast<char>(token.tag));
     }
@@ -77,9 +77,9 @@ Out parse_json_value(Iterator iterator, Iterator end)
         case Token::DOUBLE_QUOTE:
             return parse_json_string(iterator, end);
         case Token::LITERAL:
-            switch (*iterator->value) {
+            switch (*iterator->value.get()) {
                 case 't':
-                    if (strcmp(iterator->value, "true") == 0) {
+                    if (strcmp(iterator->value.get(), "true") == 0) {
                         iterator++;
                         return std::make_unique<JSONValue>(true);
                     } else {
@@ -87,7 +87,7 @@ Out parse_json_value(Iterator iterator, Iterator end)
                     }
                     break;
                 case 'f':
-                    if (strcmp(iterator->value, "false") == 0) {
+                    if (strcmp(iterator->value.get(), "false") == 0) {
                         iterator++;
                         return std::make_unique<JSONValue>(false);
                     } else {
@@ -95,7 +95,7 @@ Out parse_json_value(Iterator iterator, Iterator end)
                     }
                     break;
                 case 'n':
-                    if(strcmp(iterator->value, "null") == 0) {
+                    if(strcmp(iterator->value.get(), "null") == 0) {
                         iterator++;
                         return std::make_unique<JSONValue>();
                     } else {
@@ -103,7 +103,7 @@ Out parse_json_value(Iterator iterator, Iterator end)
                     }
                     break;
                 default:
-                    double number = strtod(iterator->value, nullptr); // TODO: Handle endptr and out-of-range errors
+                    double number = strtod(iterator->value.get(), nullptr); // TODO: Handle endptr and out-of-range errors
                     iterator++;
                     return std::make_unique<JSONValue>(number);
             }
@@ -159,7 +159,7 @@ std::string parse_json_object_key(Iterator iterator, Iterator end)
     parse_json_token(Token::DOUBLE_QUOTE, iterator);
 
     if (iterator >= end) { throw ParseError::unexpected_eof; }
-    if (iterator->tag == Token::LITERAL) { key = std::string(iterator->value); }
+    if (iterator->tag == Token::LITERAL) { key = std::string(iterator->value.get()); }
     iterator++;
 
     if (iterator >= end) { throw ParseError::unexpected_eof; }
@@ -203,7 +203,7 @@ Out parse_json_string(Iterator iterator, Iterator end)
     parse_json_token(Token::DOUBLE_QUOTE, iterator);
 
     if (iterator >= end) { throw ParseError::unexpected_eof; }
-    if (iterator->tag == Token::LITERAL) { value = JSONValue::StringType(iterator->value); }
+    if (iterator->tag == Token::LITERAL) { value = JSONValue::StringType(iterator->value.get()); }
     iterator++;
 
     if (iterator >= end) { throw ParseError::unexpected_eof; }

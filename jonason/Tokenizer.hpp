@@ -11,6 +11,7 @@
 #include <vector>
 #include <istream>
 #include <string>
+#include <memory>
 
 namespace jonason {
 
@@ -32,23 +33,20 @@ public:
     }
     tag;
 
-    char* value = nullptr;
-
     using Type = decltype(Token::LITERAL);
+
+    std::unique_ptr<char[]> value;
 
 public:
     Token() : tag(Token::LITERAL) {};
     Token(Type tag) : tag(tag) {};
-    Token(char* value) : tag(Token::LITERAL), value(value) {};
+    Token(std::unique_ptr<char[]> value) : tag(Token::LITERAL), value(std::move(value)) {};
 
     Token(Token& other) = delete;
     Token& operator=(Token other) = delete;
 
     Token(Token&& other);
     Token& operator=(Token&& other);
-
-    ~Token();
-
 };
 
 void tokenize(const std::string& string, std::vector<Token>& out);

@@ -31,7 +31,7 @@
     XCTAssertEqual(tokens.size(), 3);
     XCTAssertEqual(tokens.at(0).tag, jonason::Token::DOUBLE_QUOTE);
     XCTAssertEqual(tokens.at(1).tag, jonason::Token::LITERAL);
-    XCTAssertEqual(std::string(tokens.at(1).value), std::string("te st"));
+    XCTAssertEqual(std::string(tokens.at(1).value.get()), std::string("te st"));
     XCTAssertEqual(tokens.at(2).tag, jonason::Token::DOUBLE_QUOTE);
 }
 
@@ -43,7 +43,7 @@
 
     XCTAssertEqual(tokens.size(), 1);
     XCTAssertEqual(tokens.at(0).tag, jonason::Token::LITERAL);
-    XCTAssertEqual(std::string(tokens.at(0).value), std::string("null"));
+    XCTAssertEqual(std::string(tokens.at(0).value.get()), std::string("null"));
 }
 
 - (void) testTrueLiteral {
@@ -54,7 +54,7 @@
 
     XCTAssertEqual(tokens.size(), 1);
     XCTAssertEqual(tokens.at(0).tag, jonason::Token::LITERAL);
-    XCTAssertEqual(std::string(tokens.at(0).value), std::string("true"));
+    XCTAssertEqual(std::string(tokens.at(0).value.get()), std::string("true"));
 }
 
 - (void) testFalseLiteral {
@@ -65,7 +65,7 @@
 
     XCTAssertEqual(tokens.size(), 1);
     XCTAssertEqual(tokens.at(0).tag, jonason::Token::LITERAL);
-    XCTAssertEqual(std::string(tokens.at(0).value), std::string("false"));
+    XCTAssertEqual(std::string(tokens.at(0).value.get()), std::string("false"));
 }
 
 - (void) testObject {

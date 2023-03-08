@@ -21,12 +21,7 @@ Token& Token::operator=(Token&& other) {
     if (this == &other) { return *this; }
     tag = std::move(other.tag);
     value = std::move(other.value);
-    other.value = nullptr;
     return *this;
-}
-
-Token::~Token() {
-    delete[] value;
 }
 
 constexpr bool is_ws(char character) {
@@ -95,10 +90,10 @@ void read_literal(std::istream& istream, char*& buffer, int& buffer_size, std::p
             }
         }
     }
-    char* value = new char[buffer_size + 1];
-    std::copy(buffer, buffer + buffer_size, value);
+    auto value = std::make_unique<char[]>(buffer_size + 1);
+    std::copy(buffer, buffer + buffer_size, value.get());
     value[buffer_size] = '\0';
-    out.push_back({ value });
+    out.push_back({ std::move(value) });
 }
 
 }
