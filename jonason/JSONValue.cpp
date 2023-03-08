@@ -8,6 +8,7 @@
 #include "JSONValue.hpp"
 
 #include <utility>
+#include <cassert>
 
 namespace jonason {
 
@@ -87,6 +88,7 @@ JSONValue::~JSONValue()
 
 const JSONValue& JSONValue::operator[](const std::string& key) const
 {
+    assert(tag == OBJECT);
     auto found = object.find(key);
     if (found != object.end() && found->second) return *found->second;
     return JSONValue::null;
@@ -96,6 +98,7 @@ const JSONValue& JSONValue::operator[](const std::string& key) const
 
 const JSONValue& JSONValue::operator[](std::size_t index) const
 {
+    assert(tag == ARRAY);
     if (index < array.size() && array[index]) return *array[index];
     return JSONValue::null;
 }
