@@ -11,14 +11,15 @@
 #include <unordered_map>
 #include <vector>
 #include <string>
+#include <memory>
 
 namespace jonason {
 
 struct JSONValue {
     enum { OBJECT, ARRAY, STRING, NUMBER, BOOLEAN, JSON_NULL } tag;
 
-    using ObjectType = std::unordered_map<std::string, JSONValue*>;
-    using ArrayType = std::vector<JSONValue*>;
+    using ObjectType = std::unordered_map<std::string, std::unique_ptr<JSONValue>>;
+    using ArrayType = std::vector<std::unique_ptr<JSONValue>>;
     using StringType = std::string;
     using NumberType = double;
     using BooleanType = bool;
@@ -35,14 +36,12 @@ struct JSONValue {
     explicit JSONValue(): tag(JSON_NULL), boolean(false) {};
     explicit JSONValue(decltype(OBJECT) tag);
 
-    explicit JSONValue(const ObjectType& value): tag(OBJECT), object(value) {};
-    explicit JSONValue(const ArrayType& value): tag(ARRAY), array(value) {};
     explicit JSONValue(const StringType& value): tag(STRING), string(value) {};
     explicit JSONValue(NumberType value): tag(NUMBER), number(value) {};
     explicit JSONValue(BooleanType value): tag(BOOLEAN), boolean(value) {};
 
-    JSONValue(const JSONValue&);
-    JSONValue& operator=(const JSONValue&);
+    JSONValue(const JSONValue&) = delete;
+    JSONValue& operator=(const JSONValue&) = delete;
 
     JSONValue(JSONValue&&);
     JSONValue& operator=(JSONValue&&);

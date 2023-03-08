@@ -26,12 +26,12 @@ ParseError ParseError::unexpected_token(const Token& token) {
 // Parsers
 
 using Iterator = std::vector<Token>::iterator&;
-using Out = JSONValue*;
+using Out = std::unique_ptr<JSONValue>;
 
 static void parse_json_token(Token::Type, Iterator);
 static Out parse_json_value(Iterator, Iterator);
 static Out parse_json_object(Iterator, Iterator);
-static std::pair<std::string, JSONValue*> parse_json_object_key_value(Iterator, Iterator);
+std::pair<JSONValue::KeyType, std::unique_ptr<JSONValue>> parse_json_object_key_value(Iterator, Iterator);
 static JSONValue::KeyType parse_json_object_key(Iterator, Iterator);
 static Out parse_json_array(Iterator, Iterator);
 static Out parse_json_string(Iterator, Iterator);
@@ -81,7 +81,7 @@ Out parse_json_value(Iterator iterator, Iterator end)
                 case 't':
                     if (strcmp(iterator->value, "true") == 0) {
                         iterator++;
-                        return new JSONValue(true);
+                        return std::make_unique<JSONValue>(true);
                     } else {
                         throw ParseError::unexpected_token(*iterator);
                     }
@@ -89,7 +89,7 @@ Out parse_json_value(Iterator iterator, Iterator end)
                 case 'f':
                     if (strcmp(iterator->value, "false") == 0) {
                         iterator++;
-                        return new JSONValue(false);
+                        return std::make_unique<JSONValue>(false);
                     } else {
                         throw ParseError::unexpected_token(*iterator);
                     }
@@ -97,7 +97,7 @@ Out parse_json_value(Iterator iterator, Iterator end)
                 case 'n':
                     if(strcmp(iterator->value, "null") == 0) {
                         iterator++;
-                        return new JSONValue();
+                        return std::make_unique<JSONValue>();
                     } else {
                         throw ParseError::unexpected_token(*iterator);
                     }
@@ -105,7 +105,7 @@ Out parse_json_value(Iterator iterator, Iterator end)
                 default:
                     double number = strtod(iterator->value, nullptr); // TODO: Handle endptr and out-of-range errors
                     iterator++;
-                    return new JSONValue(number);
+                    return std::make_unique<JSONValue>(number);
             }
         case Token::OBJECT_OPEN:
             return parse_json_object(iterator, end);
@@ -120,43 +120,37 @@ Out parse_json_value(Iterator iterator, Iterator end)
 
 Out parse_json_object(Iterator iterator, Iterator end)
 {
-    JSONValue* out = new JSONValue(JSONValue::OBJECT);
+    auto out = std::make_unique<JSONValue>(JSONValue::OBJECT);
 
-    try {
-        parse_json_token(Token::OBJECT_OPEN, iterator);
+    parse_json_token(Token::OBJECT_OPEN, iterator);
 
-        while (iterator < end) {
-            switch (iterator->tag) {
-                case Token::DOUBLE_QUOTE: {
-                    auto key_value = parse_json_object_key_value(iterator, end);
-                    delete out->object[key_value.first];
-                    out->object[key_value.first] = key_value.second;
-                    break;
-                }
-                case Token::COMMA: // TODO: Handle invalid single comma in empty object
-                    iterator++;
-                    break;
-                case Token::OBJECT_CLOSE:
-                    iterator++;
-                    return out;
-                default:
-                    throw ParseError::unexpected_token(*iterator);
+    while (iterator < end) {
+        switch (iterator->tag) {
+            case Token::DOUBLE_QUOTE: {
+                auto key_value = parse_json_object_key_value(iterator, end);
+                out->object[key_value.first] = std::move(key_value.second);
+                break;
             }
+            case Token::COMMA: // TODO: Handle invalid single comma in empty object
+                iterator++;
+                break;
+            case Token::OBJECT_CLOSE:
+                iterator++;
+                return out;
+            default:
+                throw ParseError::unexpected_token(*iterator);
         }
-
-        throw ParseError::unexpected_eof;
-    } catch (...) {
-        delete out;
-        throw;
     }
+
+    throw ParseError::unexpected_eof;
 }
 
-std::pair<JSONValue::KeyType, JSONValue*> parse_json_object_key_value(Iterator iterator, Iterator end)
+std::pair<JSONValue::KeyType, std::unique_ptr<JSONValue>> parse_json_object_key_value(Iterator iterator, Iterator end)
 {
     std::string key = parse_json_object_key(iterator, end);
     parse_json_token(Token::COLON, iterator);
-    JSONValue* value = parse_json_value(iterator, end);
-    return std::make_pair(key, value);
+    auto value = parse_json_value(iterator, end);
+    return std::make_pair(key, std::move(value));
 }
 
 std::string parse_json_object_key(Iterator iterator, Iterator end)
@@ -178,31 +172,26 @@ std::string parse_json_object_key(Iterator iterator, Iterator end)
 
 static Out parse_json_array(Iterator iterator, Iterator end)
 {
-    JSONValue* out = new JSONValue(JSONValue::ARRAY);
+    auto out = std::make_unique<JSONValue>(JSONValue::ARRAY);
 
-    try {
-        parse_json_token(Token::ARRAY_OPEN, iterator);
+    parse_json_token(Token::ARRAY_OPEN, iterator);
 
-        while (iterator < end) {
-            switch (iterator->tag) {
-                case Token::COMMA:
-                    iterator++;
-                    break;
-                case Token::ARRAY_CLOSE:
-                    iterator++;
-                    return out;
-                default:
-                    JSONValue* value = parse_json_value(iterator, end);
-                    out->array.push_back(value);
-                    break;
-            }
+    while (iterator < end) {
+        switch (iterator->tag) {
+            case Token::COMMA:
+                iterator++;
+                break;
+            case Token::ARRAY_CLOSE:
+                iterator++;
+                return out;
+            default:
+                auto value = parse_json_value(iterator, end);
+                out->array.push_back(std::move(value));
+                break;
         }
-
-        throw ParseError::unexpected_eof;
-    } catch (...) {
-        delete out;
-        throw;
     }
+
+    throw ParseError::unexpected_eof;
 }
 
 // Parse String
@@ -220,7 +209,7 @@ Out parse_json_string(Iterator iterator, Iterator end)
     if (iterator >= end) { throw ParseError::unexpected_eof; }
     parse_json_token(Token::DOUBLE_QUOTE, iterator);
 
-    return new JSONValue(value);
+    return std::make_unique<JSONValue>(value);
 }
 
 }

@@ -23,27 +23,6 @@ JSONValue::JSONValue(decltype(OBJECT) tag): tag(tag) {
     }
 };
 
-JSONValue::JSONValue(const JSONValue& other)
-{
-    tag = other.tag;
-    switch (tag) {
-        case OBJECT: new(&object) ObjectType(other.object); break;
-        case ARRAY: new(&array) ArrayType(other.array); break;
-        case STRING: new(&string) StringType(other.string); break;
-        case NUMBER: number = other.number; break;
-        case BOOLEAN: boolean = other.boolean; break;
-        case JSON_NULL: boolean = false; break;
-    }
-}
-
-JSONValue& JSONValue::operator=(const JSONValue& other)
-{
-    if (this == &other) { return *this; }
-    this->~JSONValue();
-    new(this) JSONValue(other);
-    return *this;
-}
-
 JSONValue::JSONValue(JSONValue&& other)
 {
     tag = other.tag;
@@ -69,11 +48,9 @@ JSONValue::~JSONValue()
 {
     switch (tag) {
         case OBJECT:
-            for (auto&& element : object) { delete element.second; element.second = nullptr; }
             object.~ObjectType();
             break;
         case ARRAY:
-            for (auto&& element : array) { delete element; element = nullptr; }
             array.~ArrayType();
             break;
         case STRING:
