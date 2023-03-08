@@ -21,8 +21,7 @@ namespace jonason {
 struct ParseError: public std::exception {
     enum Code {
         UNEXPECTED_EOF = 1,
-        UNEXPECTED_TOKEN = 2,
-        UNKNOWN = 999
+        UNEXPECTED_TOKEN = 2
     };
 
     Code code;
