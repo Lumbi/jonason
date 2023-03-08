@@ -32,6 +32,8 @@ struct ParseError: public std::exception {
 
     explicit operator bool() { return code; }
 
+    const char* what() const noexcept override { return message.c_str(); };
+
     static const ParseError unexpected_eof;
     static ParseError unexpected_token(const Token& token);
 };
