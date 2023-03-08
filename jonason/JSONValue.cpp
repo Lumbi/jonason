@@ -38,21 +38,8 @@ JSONValue::JSONValue(const JSONValue& other)
 JSONValue& JSONValue::operator=(const JSONValue& other)
 {
     if (this == &other) { return *this; }
-    switch (tag) {
-        case OBJECT: object.~ObjectType(); break;
-        case ARRAY: array.~ArrayType(); break;
-        case STRING: string.~StringType(); break;
-        default: break;
-    }
-    tag = other.tag;
-    switch (tag) {
-        case OBJECT: new(&object) ObjectType(other.object); break;
-        case ARRAY: new(&array) ArrayType(other.array); break;
-        case STRING: new(&string) StringType(other.string); break;
-        case NUMBER: number = other.number; break;
-        case BOOLEAN: boolean = other.boolean; break;
-        case JSON_NULL: boolean = false; break;
-    }
+    this->~JSONValue();
+    new(this) JSONValue(other);
     return *this;
 }
 
@@ -72,21 +59,8 @@ JSONValue::JSONValue(JSONValue&& other)
 JSONValue& JSONValue::operator=(JSONValue&& other)
 {
     if (this == &other) { return *this; }
-    switch (tag) {
-        case OBJECT: object.~ObjectType(); break;
-        case ARRAY: array.~ArrayType(); break;
-        case STRING: string.~StringType(); break;
-        default: break;
-    }
-    tag = other.tag;
-    switch (tag) {
-        case OBJECT: new(&object) ObjectType(std::move(other.object)); break;
-        case ARRAY: new(&array) ArrayType(std::move(other.array)); break;
-        case STRING: new(&string) StringType(std::move(other.string)); break;
-        case NUMBER: number = other.number; break;
-        case BOOLEAN: boolean = other.boolean; break;
-        case JSON_NULL: boolean = false; break;
-    }
+    this->~JSONValue();
+    new(this) JSONValue(std::move(other));
     return *this;
 }
 
