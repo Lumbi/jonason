@@ -27,7 +27,7 @@ public:
         ARRAY_CLOSE = ']',
 
         DOUBLE_QUOTE = '"',
-        COLUMN = ':',
+        COLON = ':',
         COMMA = ','
     }
     tag;

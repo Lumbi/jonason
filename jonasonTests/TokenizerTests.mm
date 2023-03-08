@@ -80,7 +80,7 @@
     XCTAssertEqual(tokens.at(1).tag, jonason::Token::DOUBLE_QUOTE);
     XCTAssertEqual(tokens.at(2).tag, jonason::Token::LITERAL);
     XCTAssertEqual(tokens.at(3).tag, jonason::Token::DOUBLE_QUOTE);
-    XCTAssertEqual(tokens.at(4).tag, jonason::Token::COLUMN);
+    XCTAssertEqual(tokens.at(4).tag, jonason::Token::COLON);
     XCTAssertEqual(tokens.at(5).tag, jonason::Token::DOUBLE_QUOTE);
     XCTAssertEqual(tokens.at(6).tag, jonason::Token::LITERAL);
     XCTAssertEqual(tokens.at(7).tag, jonason::Token::DOUBLE_QUOTE);
@@ -140,7 +140,7 @@
     XCTAssertEqual(tokens.at(1).tag, jonason::Token::DOUBLE_QUOTE);
     XCTAssertEqual(tokens.at(2).tag, jonason::Token::LITERAL);
     XCTAssertEqual(tokens.at(3).tag, jonason::Token::DOUBLE_QUOTE);
-    XCTAssertEqual(tokens.at(4).tag, jonason::Token::COLUMN);
+    XCTAssertEqual(tokens.at(4).tag, jonason::Token::COLON);
     XCTAssertEqual(tokens.at(5).tag, jonason::Token::LITERAL);
     XCTAssertEqual(tokens.at(6).tag, jonason::Token::OBJECT_CLOSE);
 }

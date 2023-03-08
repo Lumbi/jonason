@@ -55,7 +55,7 @@ void tokenize(std::istream& istream, std::vector<Token>& out) {
             case Token::ARRAY_OPEN: out.push_back({ Token::ARRAY_OPEN }); break;
             case Token::ARRAY_CLOSE: out.push_back({ Token::ARRAY_CLOSE }); break;
             case Token::COMMA: out.push_back({ Token::COMMA }); break;
-            case Token::COLUMN: out.push_back({ Token::COLUMN }); break;
+            case Token::COLON: out.push_back({ Token::COLON }); break;
 
             case Token::DOUBLE_QUOTE:
                 out.push_back({ Token::DOUBLE_QUOTE });

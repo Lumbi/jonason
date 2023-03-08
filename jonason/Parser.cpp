@@ -154,7 +154,7 @@ Out parse_json_object(Iterator iterator, Iterator end)
 std::pair<JSONValue::KeyType, JSONValue*> parse_json_object_key_value(Iterator iterator, Iterator end)
 {
     std::string key = parse_json_object_key(iterator, end);
-    parse_json_token(Token::COLUMN, iterator);
+    parse_json_token(Token::COLON, iterator);
     JSONValue* value = parse_json_value(iterator, end);
     return std::make_pair(key, value);
 }
