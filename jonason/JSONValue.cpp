@@ -24,7 +24,6 @@ JSONValue::JSONValue(decltype(OBJECT) tag): tag(tag) {
 
 JSONValue::JSONValue(const JSONValue& other)
 {
-    if (this == &other) { return; }
     tag = other.tag;
     switch (tag) {
         case OBJECT: new(&object) ObjectType(other.object); break;
@@ -38,6 +37,7 @@ JSONValue::JSONValue(const JSONValue& other)
 
 JSONValue& JSONValue::operator=(const JSONValue& other)
 {
+    if (this == &other) { return *this; }
     switch (tag) {
         case OBJECT: object.~ObjectType(); break;
         case ARRAY: array.~ArrayType(); break;
@@ -71,6 +71,7 @@ JSONValue::JSONValue(JSONValue&& other)
 
 JSONValue& JSONValue::operator=(JSONValue&& other)
 {
+    if (this == &other) { return *this; }
     switch (tag) {
         case OBJECT: object.~ObjectType(); break;
         case ARRAY: array.~ArrayType(); break;
