@@ -18,6 +18,7 @@ Token::Token(Token&& other) {
 }
 
 Token& Token::operator=(Token&& other) {
+    if (this == &other) { return *this; }
     tag = std::move(other.tag);
     value = std::move(other.value);
     other.value = nullptr;
