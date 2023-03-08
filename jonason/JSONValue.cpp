@@ -68,9 +68,16 @@ JSONValue::~JSONValue()
 {
     switch (tag) {
         case OBJECT:
-            for (auto&& element : object) { delete element.second; element.second = nullptr; } break;
+            for (auto&& element : object) { delete element.second; element.second = nullptr; }
+            object.~ObjectType();
+            break;
         case ARRAY:
-            for (auto&& element : array) { delete element; element = nullptr; } break;
+            for (auto&& element : array) { delete element; element = nullptr; }
+            array.~ArrayType();
+            break;
+        case STRING:
+            string.~StringType();
+            break;
         default:
             break;
     }
