@@ -13,17 +13,15 @@ namespace jonason {
 
 // Errors
 
-const ParseError ParseError::unexpected_eof(ParseError::UNEXPECTED_EOF, std::string("Unexpected end-of-file"));
+const ParseError ParseError::unexpected_eof(ParseError::UNEXPECTED_EOF, std::string("Wow there, I didn't expect this end-of-file!"));
 
 ParseError ParseError::unexpected_token(const Token& token) {
     if (token.tag == Token::LITERAL) {
-        return ParseError(ParseError::UNEXPECTED_TOKEN, std::string("Unexpected token: ") + token.value);
+        return ParseError(ParseError::UNEXPECTED_TOKEN, std::string("Did quite get what you meant by this buddy: ") + token.value);
     } else {
-        return ParseError(ParseError::UNEXPECTED_TOKEN, std::string("Unexpected token: ") + static_cast<char>(token.tag));
+        return ParseError(ParseError::UNEXPECTED_TOKEN, std::string("Hey, is this a typo?: ") + static_cast<char>(token.tag));
     }
 }
-
-const ParseError ParseError::unknown_error(ParseError::UNKNOWN, std::string("Unknown error"));
 
 // Parsers
 

@@ -34,7 +34,6 @@ struct ParseError: public std::exception {
 
     static const ParseError unexpected_eof;
     static ParseError unexpected_token(const Token& token);
-    static const ParseError unknown_error;
 };
 
 
