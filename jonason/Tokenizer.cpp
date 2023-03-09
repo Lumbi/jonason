@@ -49,7 +49,7 @@ void skip_ws(std::istream& istream) {
     }
 }
 
-static void read_literal(std::istream& istream, char*& buffer, int& buffer_size, std::predicate<char> auto is_delimiter, std::vector<Token>& out);
+static void read_literal(std::istream& istream, std::unique_ptr<char[]>& buffer, int& buffer_size, std::predicate<char> auto is_delimiter, std::vector<Token>& out);
 
 void tokenize(const std::string& string, std::vector<Token>& out) {
     std::istringstream istream(string);
@@ -60,7 +60,7 @@ const int MAX_LITERAL_SIZE = 1 << 16; // about 65KB
 
 void tokenize(std::istream& istream, std::vector<Token>& out) {
     char char_buffer;
-    char* value_buffer = new char[MAX_LITERAL_SIZE];
+    std::unique_ptr<char[]> value_buffer = std::make_unique<char[]>(MAX_LITERAL_SIZE);
     int value_buffer_count = 0;
 
     skip_ws(istream);
@@ -92,11 +92,9 @@ void tokenize(std::istream& istream, std::vector<Token>& out) {
 
         skip_ws(istream);
     }
-
-    delete[] value_buffer;
 }
 
-void read_literal(std::istream& istream, char*& buffer, int& buffer_size, std::predicate<char> auto is_delimiter, std::vector<Token>& out)
+void read_literal(std::istream& istream, std::unique_ptr<char[]>& buffer, int& buffer_size, std::predicate<char> auto is_delimiter, std::vector<Token>& out)
 {
     char char_buffer;
     while (istream.good()) {
@@ -112,7 +110,7 @@ void read_literal(std::istream& istream, char*& buffer, int& buffer_size, std::p
         }
     }
     auto value = std::make_unique<char[]>(buffer_size + 1);
-    std::copy(buffer, buffer + buffer_size, value.get());
+    std::copy(buffer.get(), buffer.get() + buffer_size, value.get());
     value[buffer_size] = '\0';
     out.push_back({ std::move(value) });
 }
