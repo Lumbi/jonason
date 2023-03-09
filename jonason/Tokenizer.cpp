@@ -28,10 +28,30 @@ constexpr bool is_ws(char character) {
     return character == 0x20 || character == 0x0a || character == 0x0d || character == 0x09;
 }
 
+// Based on MSVC's STL implementation
+void skip_ws(std::istream& istream) {
+    if (istream.good()) {
+        std::ios_base::iostate state = std::ios_base::goodbit;
+        try {
+            for (auto c = istream.rdbuf()->sgetc();; c = istream.rdbuf()->snextc()) {
+                if (c == EOF) {
+                    state |= std::ios_base::eofbit;
+                    break;
+                } else if (!is_ws(c)) {
+                    break;
+                }
+            }
+        } catch (...) {
+            istream.setstate(std::ios_base::badbit);
+            throw;
+        }
+        istream.setstate(state);
+    }
+}
+
 static void read_literal(std::istream& istream, char*& buffer, int& buffer_size, std::predicate<char> auto is_delimiter, std::vector<Token>& out);
 
-void tokenize(const std::string& string, std::vector<Token>& out)
-{
+void tokenize(const std::string& string, std::vector<Token>& out) {
     std::istringstream istream(string);
     tokenize(istream, out);
 }
@@ -43,7 +63,7 @@ void tokenize(std::istream& istream, std::vector<Token>& out) {
     char* value_buffer = new char[MAX_LITERAL_SIZE];
     int value_buffer_count = 0;
 
-    istream >> std::ws; // NOTE: Note same behaviour as `is_ws`
+    skip_ws(istream);
 
     while (istream.get(char_buffer)) {
         switch (char_buffer) {
@@ -70,7 +90,7 @@ void tokenize(std::istream& istream, std::vector<Token>& out) {
                 break;
         }
 
-        istream >> std::ws; // NOTE: Note same behaviour as `is_ws`
+        skip_ws(istream);
     }
 
     delete[] value_buffer;
