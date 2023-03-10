@@ -14,10 +14,20 @@ Learnings:
 - I started with value semantics for `JSONValue` but quickly switched to pointers when the benchmark was calling the copy-assignment operator millions of times
 - Messing around with anonymous unions was "interesting" but made copy-constructor and copy-assignment operator pretty annoying to implement
 - Always run tests with address sanitizer on
+- Just use `std::unique_ptr`
+- Using `std::istream::get` to skip whitespaces was surprisingly slow compared to `std::ws`
 
 What I'd like to improve if I could lock myself in a cave and code for a week:
-- Safer memory management
 - Merge the tokenize and parse steps to reduce the overhead
-- Using exceptions added about 20ms overhead on a 115ms benchmark so it would be nice to get rid of it
-- Safer `char*` handling to avoid security issues
 - Use `JSON_checker` to test conformance to specification
+
+Parsing performance results
+- clang-1400.0.29.202
+- 2.9 GHz 6-Core Intel Core i9
+
+| input        | jonason  | NSJSONSerialization |
+| -            | -        | -                   |
+| canada.json  | ~105 ms  | ~75 ms              |
+| citm_ca.json | ~21 ms   | ~10 ms              |
+
+Unfortunately, `jonsason` is not only unreliable, but also abit slow. Regardless, I'm pretty happy with the results.
