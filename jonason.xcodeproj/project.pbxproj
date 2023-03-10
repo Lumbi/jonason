@@ -20,6 +20,7 @@
 		0D95A45329B2E0A200C26474 /* ParserTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0D95A45229B2E0A200C26474 /* ParserTests.mm */; };
 		0D95A45529B5929600C26474 /* PerformanceTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0D95A45429B5929600C26474 /* PerformanceTests.mm */; };
 		0D95A45729B5976000C26474 /* canada.json in Resources */ = {isa = PBXBuildFile; fileRef = 0D95A45629B5976000C26474 /* canada.json */; };
+		0D95A45D29BAC4B800C26474 /* citm_catalog.json in Resources */ = {isa = PBXBuildFile; fileRef = 0D95A45C29BAC4B800C26474 /* citm_catalog.json */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -47,6 +48,7 @@
 		0D95A45229B2E0A200C26474 /* ParserTests.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ParserTests.mm; sourceTree = "<group>"; };
 		0D95A45429B5929600C26474 /* PerformanceTests.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = PerformanceTests.mm; sourceTree = "<group>"; };
 		0D95A45629B5976000C26474 /* canada.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = canada.json; sourceTree = "<group>"; };
+		0D95A45C29BAC4B800C26474 /* citm_catalog.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = citm_catalog.json; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -104,6 +106,7 @@
 		0D95A43229B1278F00C26474 /* jonasonTests */ = {
 			isa = PBXGroup;
 			children = (
+				0D95A45C29BAC4B800C26474 /* citm_catalog.json */,
 				0D95A45629B5976000C26474 /* canada.json */,
 				0D95A44429B15F2900C26474 /* TokenizerTests.mm */,
 				0D95A45229B2E0A200C26474 /* ParserTests.mm */,
@@ -215,6 +218,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0D95A45D29BAC4B800C26474 /* citm_catalog.json in Resources */,
 				0D95A45729B5976000C26474 /* canada.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
