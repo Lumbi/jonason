@@ -24,8 +24,8 @@ Token& Token::operator=(Token&& other) {
     return *this;
 }
 
-constexpr bool is_ws(char character) {
-    return character == 0x20 || character == 0x0a || character == 0x0d || character == 0x09;
+constexpr bool is_ws(char c) {
+    return c == 0x20 || c == 0x0a || c == 0x0d || c == 0x09;
 }
 
 // Based on MSVC's STL implementation
@@ -49,70 +49,90 @@ void skip_ws(std::istream& istream) {
     }
 }
 
-static void read_literal(std::istream& istream, std::unique_ptr<char[]>& buffer, int& buffer_size, std::predicate<char> auto is_delimiter, std::vector<Token>& out);
-
-void tokenize(const std::string& string, std::vector<Token>& out) {
-    std::istringstream istream(string);
-    tokenize(istream, out);
-}
-
-const int MAX_LITERAL_SIZE = 1 << 16; // about 65KB
-
-void tokenize(std::istream& istream, std::vector<Token>& out) {
-    char char_buffer;
-    std::unique_ptr<char[]> value_buffer = std::make_unique<char[]>(MAX_LITERAL_SIZE);
-    int value_buffer_count = 0;
-
+Token Tokenizer::get_next() {
     skip_ws(istream);
-
-    while (istream.get(char_buffer)) {
-        switch (char_buffer) {
-            case Token::OBJECT_OPEN: out.push_back({ Token::OBJECT_OPEN }); break;
-            case Token::OBJECT_CLOSE: out.push_back({ Token::OBJECT_CLOSE }); break;
-            case Token::ARRAY_OPEN: out.push_back({ Token::ARRAY_OPEN }); break;
-            case Token::ARRAY_CLOSE: out.push_back({ Token::ARRAY_CLOSE }); break;
-            case Token::COMMA: out.push_back({ Token::COMMA }); break;
-            case Token::COLON: out.push_back({ Token::COLON }); break;
-
-            case Token::DOUBLE_QUOTE:
-                out.push_back({ Token::DOUBLE_QUOTE });
-                if (value_buffer_count == 0) {
-                    read_literal(istream, value_buffer, value_buffer_count, [](char c){ return c == Token::DOUBLE_QUOTE; }, out);
-                } else {
-                    value_buffer_count = 0;
-                }
-                break;
-
-            default:
-                value_buffer[0] = char_buffer;
-                value_buffer_count = 1;
-                read_literal(istream, value_buffer, value_buffer_count, [](char c){ return is_ws(c) || c == Token::COMMA || c == Token::OBJECT_CLOSE || c == Token::ARRAY_CLOSE; }, out);
-                break;
-        }
-
-        skip_ws(istream);
+    if (!istream.good()) { return { Token::END_OF_FILE }; }
+    istream.get(char_buffer);
+    switch (char_buffer) {
+        case Token::OBJECT_OPEN: return { Token::OBJECT_OPEN };
+        case Token::OBJECT_CLOSE: return { Token::OBJECT_CLOSE };
+        case Token::ARRAY_OPEN: return { Token::ARRAY_OPEN };
+        case Token::ARRAY_CLOSE: return { Token::ARRAY_CLOSE };
+        case Token::COMMA: return { Token::COMMA };
+        case Token::COLON: return { Token::COLON };
+        case '"': return read_string_literal(char_buffer);
+        default: return read_any_literal(char_buffer);
     }
 }
 
-void read_literal(std::istream& istream, std::unique_ptr<char[]>& buffer, int& buffer_size, std::predicate<char> auto is_delimiter, std::vector<Token>& out)
-{
+Token Tokenizer::read_string_literal(char start_char) {
+    value_buffer_count = 0;
+
     char char_buffer;
     while (istream.good()) {
         char peek = istream.peek();
-        if (is_delimiter(peek)) {
+
+        if (peek == '"') {
+            istream.get();
             break;
         } else {
             istream.get(char_buffer);
-            if (buffer_size < MAX_LITERAL_SIZE) {
-                buffer[buffer_size] = char_buffer;
-                buffer_size++;
+            if (value_buffer_count < MAX_LITERAL_SIZE) {
+                value_buffer[value_buffer_count] = char_buffer;
+                value_buffer_count++;
             }
         }
     }
-    auto value = std::make_unique<char[]>(buffer_size + 1);
-    std::copy(buffer.get(), buffer.get() + buffer_size, value.get());
-    value[buffer_size] = '\0';
-    out.push_back({ std::move(value) });
+
+    if (value_buffer_count > 0) {
+        auto value = std::make_unique<char[]>(value_buffer_count + 1);
+        std::copy(value_buffer.get(), value_buffer.get() + value_buffer_count, value.get());
+        value[value_buffer_count] = '\0';
+        return { Token::STRING, std::move(value) };
+    } else {
+        return { Token::END_OF_FILE };
+    }
+}
+
+Token Tokenizer::read_any_literal(char start_char) {
+    value_buffer[0] = start_char;
+    value_buffer_count = 1;
+
+    char char_buffer;
+    while (istream.good()) {
+        char peek = istream.peek();
+
+        if (is_ws(peek) || peek == Token::COMMA || peek == Token::OBJECT_CLOSE || peek == Token::ARRAY_CLOSE) {
+            break;
+        } else {
+            istream.get(char_buffer);
+            if (value_buffer_count < MAX_LITERAL_SIZE) {
+                value_buffer[value_buffer_count] = char_buffer;
+                value_buffer_count++;
+            }
+        }
+    }
+
+    if (value_buffer_count > 0) {
+        auto value = std::make_unique<char[]>(value_buffer_count + 1);
+        std::copy(value_buffer.get(), value_buffer.get() + value_buffer_count, value.get());
+        value[value_buffer_count] = '\0';
+        return { Token::LITERAL, std::move(value) };
+    } else {
+        return { Token::END_OF_FILE };
+    }
+}
+
+void tokenize(std::istream& istream, std::vector<Token>& out)
+{
+    Tokenizer tokenizer(istream);
+    bool is_eof = true;
+    do {
+        Token token = tokenizer.get_next();
+        is_eof = token.is_eof();
+        if (!is_eof) { out.push_back(std::move(token)); }
+    }
+    while (!is_eof);
 }
 
 }

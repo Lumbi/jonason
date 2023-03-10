@@ -47,7 +47,7 @@
 
         [self startMeasuring];
         try {
-            auto json = jonason::parse(ifstream);
+            jonason::parse(ifstream);
         } catch (...) {
             XCTFail();
         }
@@ -62,9 +62,12 @@
         std::ifstream ifstream;
         ifstream.open(file_path, std::ifstream::in);
 
+        jonason::Tokenizer tokenizer(ifstream);
         [self startMeasuring];
-        std::vector<jonason::Token> tokens;
-        jonason::tokenize(ifstream, tokens);
+        while (true) {
+            jonason::Token token = tokenizer.get_next();
+            if (token.is_eof()) break;
+        }
         [self stopMeasuring];
     }];
 }

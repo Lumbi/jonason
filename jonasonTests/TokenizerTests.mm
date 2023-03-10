@@ -28,11 +28,9 @@
     std::istringstream istream(json);
     jonason::tokenize(istream, tokens);
 
-    XCTAssertEqual(tokens.size(), 3);
-    XCTAssertEqual(tokens.at(0).tag, jonason::Token::DOUBLE_QUOTE);
-    XCTAssertEqual(tokens.at(1).tag, jonason::Token::LITERAL);
-    XCTAssertEqual(std::string(tokens.at(1).value.get()), std::string("te st"));
-    XCTAssertEqual(tokens.at(2).tag, jonason::Token::DOUBLE_QUOTE);
+    XCTAssertEqual(tokens.size(), 1);
+    XCTAssertEqual(tokens.at(0).tag, jonason::Token::STRING);
+    XCTAssertEqual(std::string(tokens.at(0).value.get()), std::string("te st"));
 }
 
 - (void) testNullLiteral {
@@ -75,16 +73,12 @@
     std::istringstream istream(json);
     jonason::tokenize(istream, tokens);
 
-    XCTAssertEqual(tokens.size(), 9);
+    XCTAssertEqual(tokens.size(), 5);
     XCTAssertEqual(tokens.at(0).tag, jonason::Token::OBJECT_OPEN);
-    XCTAssertEqual(tokens.at(1).tag, jonason::Token::DOUBLE_QUOTE);
-    XCTAssertEqual(tokens.at(2).tag, jonason::Token::LITERAL);
-    XCTAssertEqual(tokens.at(3).tag, jonason::Token::DOUBLE_QUOTE);
-    XCTAssertEqual(tokens.at(4).tag, jonason::Token::COLON);
-    XCTAssertEqual(tokens.at(5).tag, jonason::Token::DOUBLE_QUOTE);
-    XCTAssertEqual(tokens.at(6).tag, jonason::Token::LITERAL);
-    XCTAssertEqual(tokens.at(7).tag, jonason::Token::DOUBLE_QUOTE);
-    XCTAssertEqual(tokens.at(8).tag, jonason::Token::OBJECT_CLOSE);
+    XCTAssertEqual(tokens.at(1).tag, jonason::Token::STRING);
+    XCTAssertEqual(tokens.at(2).tag, jonason::Token::COLON);
+    XCTAssertEqual(tokens.at(3).tag, jonason::Token::STRING);
+    XCTAssertEqual(tokens.at(4).tag, jonason::Token::OBJECT_CLOSE);
 }
 
 - (void) testArray {
@@ -135,14 +129,12 @@
     std::istringstream istream(json);
     jonason::tokenize(istream, tokens);
 
-    XCTAssertEqual(tokens.size(), 7);
+    XCTAssertEqual(tokens.size(), 5);
     XCTAssertEqual(tokens.at(0).tag, jonason::Token::OBJECT_OPEN);
-    XCTAssertEqual(tokens.at(1).tag, jonason::Token::DOUBLE_QUOTE);
-    XCTAssertEqual(tokens.at(2).tag, jonason::Token::LITERAL);
-    XCTAssertEqual(tokens.at(3).tag, jonason::Token::DOUBLE_QUOTE);
-    XCTAssertEqual(tokens.at(4).tag, jonason::Token::COLON);
-    XCTAssertEqual(tokens.at(5).tag, jonason::Token::LITERAL);
-    XCTAssertEqual(tokens.at(6).tag, jonason::Token::OBJECT_CLOSE);
+    XCTAssertEqual(tokens.at(1).tag, jonason::Token::STRING);
+    XCTAssertEqual(tokens.at(2).tag, jonason::Token::COLON);
+    XCTAssertEqual(tokens.at(3).tag, jonason::Token::LITERAL);
+    XCTAssertEqual(tokens.at(4).tag, jonason::Token::OBJECT_CLOSE);
 }
 
 @end

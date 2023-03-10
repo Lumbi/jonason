@@ -9,6 +9,9 @@
 
 #include "Tokenizer.hpp"
 
+#include <cassert>
+#include <sstream>
+
 namespace jonason {
 
 // Errors
@@ -25,191 +28,120 @@ ParseError ParseError::unexpected_token(const Token& token) {
 
 // Parsers
 
-using Iterator = std::vector<Token>::iterator&;
 using Out = std::unique_ptr<JSONValue>;
 
-static void parse_json_token(Token::Type, Iterator);
-static Out parse_json_value(Iterator, Iterator);
-static Out parse_json_object(Iterator, Iterator);
-std::pair<JSONValue::KeyType, std::unique_ptr<JSONValue>> parse_json_object_key_value(Iterator, Iterator);
-static JSONValue::KeyType parse_json_object_key(Iterator, Iterator);
-static Out parse_json_array(Iterator, Iterator);
-static Out parse_json_string(Iterator, Iterator);
+static Out parse_json_value(Token&, Tokenizer&);
+static Out parse_json_object(Tokenizer&);
+static Out parse_json_array(Tokenizer&);
+static Out parse_json_string(Token&);
+static Out parse_json_literal(Token&);
 
 std::unique_ptr<JSONValue> parse(const std::string& string)
 {
-    if (string.empty()) { throw ParseError::unexpected_eof; }
-
-    std::vector<Token> tokens;
-    tokenize(string, tokens);
-
-    if (tokens.empty()) { throw ParseError::unexpected_eof; }
-
-    auto begin = tokens.begin();
-    auto end = tokens.end();
-    return std::unique_ptr<JSONValue>(parse_json_value(begin, end));
+    std::istringstream istream(string);
+    return parse(istream);
 }
 
 std::unique_ptr<JSONValue> parse(std::istream& istream)
 {
-    std::vector<Token> tokens;
-    tokenize(istream, tokens);
-
-    if (tokens.empty()) { throw ParseError::unexpected_eof; }
-
-    auto begin = tokens.begin();
-    auto end = tokens.end();
-    return std::unique_ptr<JSONValue>(parse_json_value(begin, end));
+    Tokenizer tokenizer(istream);
+    Token token = tokenizer.get_next();
+    return std::unique_ptr<JSONValue>(parse_json_value(token, tokenizer));
 }
 
-static void parse_json_token(Token::Type token, Iterator iterator)
+Out parse_json_value(Token& token, Tokenizer& tokenizer)
 {
-    if (iterator->tag == token) {
-        iterator++;
-    } else {
-        throw ParseError::unexpected_token(*iterator);
-    }
-}
-
-Out parse_json_value(Iterator iterator, Iterator end)
-{
-    switch (iterator->tag) {
-        case Token::DOUBLE_QUOTE:
-            return parse_json_string(iterator, end);
+    switch (token.tag) {
+        case Token::STRING:
+            return parse_json_string(token);
         case Token::LITERAL:
-            switch (*iterator->value.get()) {
-                case 't':
-                    if (strcmp(iterator->value.get(), "true") == 0) {
-                        iterator++;
-                        return std::make_unique<JSONValue>(true);
-                    } else {
-                        throw ParseError::unexpected_token(*iterator);
-                    }
-                    break;
-                case 'f':
-                    if (strcmp(iterator->value.get(), "false") == 0) {
-                        iterator++;
-                        return std::make_unique<JSONValue>(false);
-                    } else {
-                        throw ParseError::unexpected_token(*iterator);
-                    }
-                    break;
-                case 'n':
-                    if(strcmp(iterator->value.get(), "null") == 0) {
-                        iterator++;
-                        return std::make_unique<JSONValue>();
-                    } else {
-                        throw ParseError::unexpected_token(*iterator);
-                    }
-                    break;
-                default:
-                    double number = strtod(iterator->value.get(), nullptr); // TODO: Handle endptr and out-of-range errors
-                    iterator++;
-                    return std::make_unique<JSONValue>(number);
-            }
+            return parse_json_literal(token);
         case Token::OBJECT_OPEN:
-            return parse_json_object(iterator, end);
+            return parse_json_object(tokenizer);
         case Token::ARRAY_OPEN:
-            return parse_json_array(iterator, end);
+            return parse_json_array(tokenizer);
+        case Token::END_OF_FILE:
+            throw ParseError::unexpected_eof;
         default:
-            throw ParseError::unexpected_token(*iterator);
+            throw ParseError::unexpected_token(token);
     }
 }
 
-// Parse Object
-
-Out parse_json_object(Iterator iterator, Iterator end)
+Out parse_json_object(Tokenizer& tokenizer)
 {
     auto out = std::make_unique<JSONValue>(JSONValue::OBJECT);
-
-    parse_json_token(Token::OBJECT_OPEN, iterator);
-
-    while (iterator < end) {
-        switch (iterator->tag) {
-            case Token::DOUBLE_QUOTE: {
-                auto key_value = parse_json_object_key_value(iterator, end);
-                out->object[key_value.first] = std::move(key_value.second);
+    while (true) {
+        Token token = tokenizer.get_next();
+        switch (token.tag) {
+            case Token::STRING: {
+                std::string key(token.value.get());
+                Token token_colon = tokenizer.get_next();
+                if (token_colon.tag != Token::COLON) { throw ParseError::unexpected_token(token_colon); }
+                Token token_value = tokenizer.get_next();
+                auto value = parse_json_value(token_value, tokenizer);
+                out->object[key] = std::move(value);
                 break;
             }
-            case Token::COMMA: // TODO: Handle invalid single comma in empty object
-                iterator++;
-                break;
-            case Token::OBJECT_CLOSE:
-                iterator++;
-                return out;
-            default:
-                throw ParseError::unexpected_token(*iterator);
+            case Token::COMMA: break; // TODO: Handle invalid single comma in empty object
+            case Token::OBJECT_CLOSE: return out;
+            case Token::END_OF_FILE: throw ParseError::unexpected_eof;
+            default: throw ParseError::unexpected_token(token);
         }
     }
-
-    throw ParseError::unexpected_eof;
 }
 
-std::pair<JSONValue::KeyType, std::unique_ptr<JSONValue>> parse_json_object_key_value(Iterator iterator, Iterator end)
-{
-    std::string key = parse_json_object_key(iterator, end);
-    parse_json_token(Token::COLON, iterator);
-    auto value = parse_json_value(iterator, end);
-    return std::make_pair(key, std::move(value));
-}
-
-std::string parse_json_object_key(Iterator iterator, Iterator end)
-{
-    std::string key;
-    parse_json_token(Token::DOUBLE_QUOTE, iterator);
-
-    if (iterator >= end) { throw ParseError::unexpected_eof; }
-    if (iterator->tag == Token::LITERAL) { key = std::string(iterator->value.get()); }
-    iterator++;
-
-    if (iterator >= end) { throw ParseError::unexpected_eof; }
-    parse_json_token(Token::DOUBLE_QUOTE, iterator);
-
-    return key;
-}
-
-// Parse Array
-
-static Out parse_json_array(Iterator iterator, Iterator end)
+static Out parse_json_array(Tokenizer& tokenizer)
 {
     auto out = std::make_unique<JSONValue>(JSONValue::ARRAY);
-
-    parse_json_token(Token::ARRAY_OPEN, iterator);
-
-    while (iterator < end) {
-        switch (iterator->tag) {
-            case Token::COMMA:
-                iterator++;
-                break;
-            case Token::ARRAY_CLOSE:
-                iterator++;
-                return out;
+    while (true) {
+        Token token = tokenizer.get_next();
+        switch (token.tag) {
+            case Token::COMMA: break;
+            case Token::ARRAY_CLOSE: return out;
+            case Token::END_OF_FILE: throw ParseError::unexpected_eof;
             default:
-                auto value = parse_json_value(iterator, end);
+                auto value = parse_json_value(token, tokenizer);
                 out->array.push_back(std::move(value));
                 break;
         }
     }
-
-    throw ParseError::unexpected_eof;
 }
 
-// Parse String
-
-Out parse_json_string(Iterator iterator, Iterator end)
+Out parse_json_string(Token& token)
 {
-    JSONValue::StringType value;
-
-    parse_json_token(Token::DOUBLE_QUOTE, iterator);
-
-    if (iterator >= end) { throw ParseError::unexpected_eof; }
-    if (iterator->tag == Token::LITERAL) { value = JSONValue::StringType(iterator->value.get()); }
-    iterator++;
-
-    if (iterator >= end) { throw ParseError::unexpected_eof; }
-    parse_json_token(Token::DOUBLE_QUOTE, iterator);
-
+    if (token.tag != Token::STRING) { throw ParseError::unexpected_token(token); }
+    JSONValue::StringType value(token.value.get());
     return std::make_unique<JSONValue>(value);
+}
+
+Out parse_json_literal(Token& token)
+{
+    switch (*token.value.get()) {
+        case 't':
+            if (strcmp(token.value.get(), "true") == 0) {
+                return std::make_unique<JSONValue>(true);
+            } else {
+                throw ParseError::unexpected_token(token);
+            }
+            break;
+        case 'f':
+            if (strcmp(token.value.get(), "false") == 0) {
+                return std::make_unique<JSONValue>(false);
+            } else {
+                throw ParseError::unexpected_token(token);
+            }
+            break;
+        case 'n':
+            if(strcmp(token.value.get(), "null") == 0) {
+                return std::make_unique<JSONValue>();
+            } else {
+                throw ParseError::unexpected_token(token);
+            }
+            break;
+        default:
+            double number = strtod(token.value.get(), nullptr); // TODO: Handle endptr and out-of-range errors
+            return std::make_unique<JSONValue>(number);
+    }
 }
 
 }
